@@ -1,18 +1,16 @@
 /*
-    COMP 2710 – Project 4
-    File: main_p4_beginner.cpp
-    How to compile: g++ -std=c++17 main_p4_beginner.cpp -o analyzer
-    How to run:     ./analyzer
-
-    Notes (kept simple on purpose):
-    - Prompts FIRST for an output filename and checks that it can be created.
-      If not, it asks again.
-    - Asks how many input files to read (must be a positive integer).
-    - Each input file must contain ONE number per line. Anything else is illegal.
-    - After reading all files, the program:
-        * sorts all values,
-        * prints mean, median, and the average of all modes,
-        * writes a CSV file in the required format.
+    how to compile: g++ main.cpp
+    how to run: ./a.out
+    Michael Hofelich
+    Sources: asked chat gpt “How do I reject a file if it has letters, commas, or blank lines instead of numbers?”
+    w3schools:
+    Files – https://www.w3schools.com/cpp/cpp_files.asp
+    Vectors – https://www.w3schools.com/cpp/cpp_vectors.asp
+    Maps – https://www.w3schools.com/cpp/cpp_maps.asp
+    Math – https://www.w3schools.com/cpp/cpp_math.asp
+    Input/Output – https://www.w3schools.com/cpp/cpp_files.asp
+    Manipulators – https://www.w3schools.com/cpp/cpp_files.asp#iomanip
+    
 */
 
 #include <iostream>
@@ -26,7 +24,7 @@
 using namespace std;
 
 int main() {
-    // 1) Ask for output filename and make sure it is writable.
+   
     string outPath;
     while (true) {
         cout << "Enter the output filename to save: ";
@@ -36,7 +34,7 @@ int main() {
         ofstream test(outPath.c_str(), ios::trunc);
         if (test.is_open()) {
             test.close();
-            // Print confirmation line right away (like example).
+            
             cout << "*** File " << outPath << " has been written to disk ***\n\n";
             break;
         } else {
@@ -44,10 +42,10 @@ int main() {
         }
     }
 
-    // 2) Welcome message
+    
     cout << "*** Welcome to Michael's Data Analyzer ***\n\n";
 
-    // 3) Number of files (must be positive)
+    
     int numFiles;
     cout << "Enter the number of files to read: ";
     while (true) {
@@ -63,13 +61,13 @@ int main() {
             continue;
         }
         string throwAway;
-        getline(cin, throwAway); // consume the end of line
+        getline(cin, throwAway);
         break;
     }
 
     vector<double> allNumbers;
 
-    // 4) Read each file
+    
     for (int i = 1; i <= numFiles; i++) {
         while (true) {
             cout << "\n\nEnter the filename for file " << i << ": ";
@@ -87,9 +85,9 @@ int main() {
             bool bad = false;
             int linesRead = 0;
 
-            // Read one line at a time. Each line should be ONE number only.
+            
             while (getline(fin, line)) {
-                // Skip lines that are only spaces/tabs/newlines
+                
                 bool onlySpaces = true;
                 for (size_t k = 0; k < line.size(); k++) {
                     if (!(line[k] == ' ' || line[k] == '\t' || line[k] == '\r' || line[k] == '\n')) {
@@ -103,7 +101,7 @@ int main() {
                 double x;
                 if (!(ss >> x)) { bad = true; break; }
 
-                // Make sure there is no extra junk on the same line
+                
                 string extra;
                 if (ss >> extra) { bad = true; break; }
 
@@ -118,11 +116,11 @@ int main() {
                 cout << "\nNot an input file. Illegal content/structure detected. Please try again.\n";
             } else {
                 cout << "\nThe list of " << fileNumbers.size() << " values in file " << fname << " is:\n";
-                // Print values exactly as read (default formatting)
+                
                 for (size_t j = 0; j < fileNumbers.size(); j++) {
                     cout << fileNumbers[j] << "\n";
                 }
-                // Add to the total list
+                
                 for (size_t j = 0; j < fileNumbers.size(); j++) {
                     allNumbers.push_back(fileNumbers[j]);
                 }
@@ -131,10 +129,10 @@ int main() {
         }
     }
 
-    // 5) Summary
+   
     cout << "\n\n*** Summarized Statistics ***\n\n";
 
-    // Sort a copy for display and stats
+   
     vector<double> sorted = allNumbers;
     sort(sorted.begin(), sorted.end());
 
@@ -142,7 +140,7 @@ int main() {
     for (size_t i = 0; i < sorted.size(); i++) {
         if (i > 0) cout << " ";
         cout << sorted[i];
-        // Put a newline every 12 numbers to avoid long lines
+        
         if ((i + 1) % 12 == 0) cout << "\n";
     }
     if (!sorted.empty()) cout << "\n\n";
@@ -168,7 +166,7 @@ int main() {
         }
     }
 
-    // Mode average (beginner approach: since it's sorted, count runs)
+    // Mode average
     double modeAvg = 0.0;
     if (!sorted.empty()) {
         int bestCount = 0;
@@ -179,7 +177,7 @@ int main() {
             if (i < sorted.size() && sorted[i] == sorted[i - 1]) {
                 currentCount++;
             } else {
-                // End of a run for value sorted[i-1]
+                
                 double value = sorted[i - 1];
                 if (currentCount > bestCount) {
                     bestCount = currentCount;
@@ -206,19 +204,19 @@ int main() {
     cout << "The mode is "   << modeAvg << "\n\n";
     cout << "*** Goodbye. ***\n";
 
-    // 6) Write the CSV file (retry if it somehow fails here).
+    // Write the CSV file
     while (true) {
         ofstream fout(outPath.c_str(), ios::trunc);
         if (fout.is_open()) {
-            // First line (label) + newline
+     
             fout << "The orderly sorted list of " << sorted.size() << " values is:\n";
-            // Second line: values comma-separated
+           
             for (size_t i = 0; i < sorted.size(); i++) {
                 if (i > 0) fout << ",";
-                fout << sorted[i]; // default formatting for values
+                fout << sorted[i]; 
             }
             fout << "\n";
-            // Stats: fixed with 4 decimals
+    
             fout.setf(ios::fixed);
             fout << setprecision(4);
             fout << "mean,"   << mean    << "\n";
@@ -228,7 +226,7 @@ int main() {
             cout << "\n*** File " << outPath << " has been written to disk ***\n\n";
             break;
         } else {
-            // Shouldn't happen because we already checked, but handle anyway.
+            
             cout << "\nInvalid output path. Please enter another output path: ";
             if (!getline(cin, outPath)) return 0;
         }
